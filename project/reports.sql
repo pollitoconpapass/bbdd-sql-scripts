@@ -41,16 +41,16 @@ EXEC sp_ReporteMensual @mes = 1, @anio = 2025;
 -- Consulta adicional 2: Análisis de costos de planes alimenticios
 SELECT 
     pa.idPlan,
-    u.nombres + ' ' + u.apellidos AS Usuario,
+    c.nombres + ' ' + c.apellidos AS Cliente,
     pa.tipoPlan,
     SUM(a.precio * dpa.cantidad / 100) AS CostoTotal,
     AVG(a.precio * dpa.cantidad / 100) AS CostoPromedioPorAlimento,
     COUNT(DISTINCT dpa.idAlimento) AS CantidadAlimentosDistintos
 FROM Plan_Alimentacion pa
-INNER JOIN Usuario u ON pa.idUsuario = u.idUsuario
+INNER JOIN Cliente c ON pa.idCliente = c.idCliente
 INNER JOIN Detalle_Plan_Alimento dpa ON pa.idPlan = dpa.idPlan
 INNER JOIN Alimentos a ON dpa.idAlimento = a.idAlimento
-GROUP BY pa.idPlan, u.nombres, u.apellidos, pa.tipoPlan
+GROUP BY pa.idPlan, c.nombres, c.apellidos, pa.tipoPlan
 ORDER BY CostoTotal DESC;
 
 -- Consulta adicional 3: Función para calcular edad en años exactos

@@ -2,14 +2,14 @@
 -- INSERCIÓN DE DATOS - TABLAS MAESTRAS 
 -- =============================================
 
-INSERT INTO Usuario (nombres, apellidos, sexo, edad, peso, altura, telefono, correo, objetivo, nivelActividad, tiempoDisponible) VALUES
+INSERT INTO Cliente (nombres, apellidos, sexo, edad, peso, altura, telefono, correo, objetivo, nivelActividad, tiempoDisponible) VALUES
 ('Alan Gabriel', 'García Pérez', 'Masculino', 48, 75.5, 1.75, 987654321, 'alangarcia@peru.pe', 'Perder peso', 'Moderado', 70),
 ('María Elena', 'González López', 'Femenino', 32, 68.2, 1.62, 912345678, 'maria.gonzalez@email.com', 'Ganar masa muscular', 'Alto', 90),
 ('Carlos Alberto', 'Rodríguez Silva', 'Masculino', 25, 82.0, 1.80, 945678123, 'carlos.rodriguez@email.com', 'Mantener peso', 'Bajo', 45),
 ('Ana Sofía', 'Martínez Torres', 'Femenino', 29, 55.8, 1.58, 923456789, 'ana.martinez@email.com', 'Perder peso', 'Moderado', 75),
 ('Luis Fernando', 'Herrera Díaz', 'Masculino', 35, 90.3, 1.85, 956789012, 'luis.herrera@email.com', 'Ganar masa muscular', 'Alto', 120);
 
--- SELECT * FROM Usuario
+-- SELECT * FROM Cliente
 
 INSERT INTO Nutricionista (nombre, apellidos, edad, telefono, correo) VALUES
 ('Patricia', 'Vásquez Morales', 38, 987123456, 'patricia.vasquez@saludcenter.com'),
@@ -53,7 +53,7 @@ INSERT INTO Ejercicio (nombre, duracion, intensidad, calorias) VALUES
 -- INSERCIÓN DE DATOS - TABLAS DE TRANSACCIONES
 -- =============================================
 
-INSERT INTO Encuesta_Inicial (idUsuario, preferencias, restriccionesAlimenticias) VALUES
+INSERT INTO Encuesta_Inicial (idCliente, preferencias, restriccionesAlimenticias) VALUES
 (1, 'Comida casera, sabores suaves', 'Intolerancia a la lactosa'),
 (2, 'Comida mediterránea, picante', 'Ninguna'),
 (3, 'Comida vegetariana', 'Vegetariano estricto'),
@@ -62,7 +62,7 @@ INSERT INTO Encuesta_Inicial (idUsuario, preferencias, restriccionesAlimenticias
 
 -- SELECT * FROM Encuesta_Inicial
 
-INSERT INTO Plan_Alimentacion (idUsuario, tipoPlan, fechaInicio, fechaFin, caloriasDiarias) VALUES
+INSERT INTO Plan_Alimentacion (idCliente, tipoPlan, fechaInicio, fechaFin, caloriasDiarias) VALUES
 (1, 'Pérdida de peso', '2025-01-01', '2025-03-01', 1800),
 (1, 'Mantenimiento', '2025-03-02', '2025-06-01', 2000),
 (2, 'Ganancia muscular', '2025-01-15', '2025-04-15', 2500),
@@ -81,7 +81,7 @@ INSERT INTO Plan_Alimentacion (idUsuario, tipoPlan, fechaInicio, fechaFin, calor
 
 -- SELECT * FROM Plan_Alimentacion
 
-INSERT INTO Rutina (idUsuario, fecha, duracion) VALUES
+INSERT INTO Rutina (idCliente, fecha, duracion) VALUES
 (1, '2025-01-05', 60),
 (1, '2025-01-12', 45),
 (2, '2025-01-20', 90),
@@ -98,7 +98,7 @@ INSERT INTO Rutina (idUsuario, fecha, duracion) VALUES
 -- ALTER TABLE Recomendaciones
 -- ALTER COLUMN tipo VARCHAR(50) NOT NULL;
 
-INSERT INTO Recomendaciones (idUsuario, tipo, contenido, fechaGeneracion) VALUES
+INSERT INTO Recomendaciones (idCliente, tipo, contenido, fechaGeneracion) VALUES
 (1, 'Hidratación', 'Aumentar consumo de agua a 2.5L diarios', '2025-01-03'),
 (1, 'Ejercicio', 'Incluir más ejercicios cardiovasculares', '2025-01-10'),
 (2, 'Alimentación', 'Incrementar proteínas post-entreno', '2025-01-18'),
@@ -113,7 +113,7 @@ INSERT INTO Recomendaciones (idUsuario, tipo, contenido, fechaGeneracion) VALUES
 -- SELECT * FROM Recomendaciones
 
 
-INSERT INTO Notificaciones (idUsuario, mensaje, fechaGeneracion, tipo) VALUES
+INSERT INTO Notificaciones (idCliente, mensaje, fechaGeneracion, tipo) VALUES
 (1, 'Recordatorio: Es hora de tu comida', '2025-01-05', 'Alimentación'),
 (1, 'Tu rutina de ejercicios te espera', '2025-01-05', 'Ejercicio'),
 (2, 'Nuevo plan nutricional disponible', '2025-01-18', 'Alimentación'),
@@ -168,7 +168,7 @@ INSERT INTO Detalle_Rutina_Ejercicio (idRutina, idEjercicio, repeticiones, serie
 (8, 1, 12, 2),
 (9, 4, 12, 5);
 
-INSERT INTO Asignacion_Nutricionista (idUsuario, idNutricionista, fechaAsignacion) VALUES
+INSERT INTO Asignacion_Nutricionista (idCliente, idNutricionista, fechaAsignacion) VALUES
 (1, 1, '2025-01-01'),
 (2, 2, '2025-01-15'),
 (3, 3, '2025-02-01'),
@@ -180,7 +180,7 @@ INSERT INTO Asignacion_Nutricionista (idUsuario, idNutricionista, fechaAsignacio
 (4, 3, '2025-04-11'),
 (5, 1, '2025-05-16');
 
-INSERT INTO Asignacion_Entrenador (idUsuario, idEntrenador, fechaAsignacion) VALUES
+INSERT INTO Asignacion_Entrenador (idCliente, idEntrenador, fechaAsignacion) VALUES
 (1, 1, '2025-01-05'),
 (2, 2, '2025-01-20'),
 (3, 3, '2025-02-05'),

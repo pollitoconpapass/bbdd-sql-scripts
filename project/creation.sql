@@ -5,8 +5,8 @@
 -- GO
 
 -- === TABLAS MAESTRAS ===
-CREATE TABLE Usuario (
-    idUsuario INT IDENTITY(1,1) PRIMARY KEY,
+CREATE TABLE Cliente (
+    idCliente INT IDENTITY(1,1) PRIMARY KEY,
     nombres VARCHAR(50) NOT NULL,
     apellidos VARCHAR(50) NOT NULL,
     sexo VARCHAR(50) NOT NULL,
@@ -61,50 +61,50 @@ GO
 
 -- === TABLAS TRANSACCIONES ===
 CREATE TABLE Encuesta_Inicial (
-    idUsuario INT PRIMARY KEY,
+    idCliente INT PRIMARY KEY,
     preferencias VARCHAR(50) NOT NULL,
     restriccionesAlimenticias VARCHAR(50) NOT NULL,
-    FOREIGN KEY (idUsuario) REFERENCES Usuario(idUsuario) ON DELETE CASCADE
+    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente) ON DELETE CASCADE
 );
 GO
 
 CREATE TABLE Plan_Alimentacion (
     idPlan INT IDENTITY(1,1) PRIMARY KEY,
-    idUsuario INT NOT NULL,
+    idCliente INT NOT NULL,
     tipoPlan VARCHAR(50) NOT NULL,
     fechaInicio DATE NOT NULL,
     fechaFin DATE NOT NULL,
     caloriasDiarias INT NOT NULL,
-    FOREIGN KEY (idUsuario) REFERENCES Usuario(idUsuario) ON DELETE CASCADE
+    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente) ON DELETE CASCADE
 );
 GO
 
 CREATE TABLE Rutina (
     idRutina INT IDENTITY(1,1) PRIMARY KEY,
-    idUsuario INT NOT NULL,
+    idCliente INT NOT NULL,
     fecha DATE NOT NULL,
     duracion INT NOT NULL,
-    FOREIGN KEY (idUsuario) REFERENCES Usuario(idUsuario) ON DELETE CASCADE
+    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente) ON DELETE CASCADE
 );
 GO
 
 CREATE TABLE Recomendaciones (
     idRecomendacion INT IDENTITY(1,1) PRIMARY KEY,
-    idUsuario INT NOT NULL,
+    idCliente INT NOT NULL,
     tipo VARCHAR(50) NOT NULL,
     contenido VARCHAR(50) NOT NULL,
     fechaGeneracion DATE NOT NULL,
-    FOREIGN KEY (idUsuario) REFERENCES Usuario(idUsuario) ON DELETE CASCADE
+    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente) ON DELETE CASCADE
 );
 GO
 
 CREATE TABLE Notificaciones (
     idNotificacion INT IDENTITY(1,1) PRIMARY KEY,
-    idUsuario INT NOT NULL,
+    idCliente INT NOT NULL,
     mensaje VARCHAR(100) NOT NULL,
     fechaGeneracion DATE NOT NULL,
     tipo VARCHAR(50) NOT NULL,
-    FOREIGN KEY (idUsuario) REFERENCES Usuario(idUsuario) ON DELETE CASCADE
+    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente) ON DELETE CASCADE
 );
 GO
 
@@ -133,20 +133,20 @@ GO
 
 CREATE TABLE Asignacion_Nutricionista (
     idAsignacion INT IDENTITY(1,1) PRIMARY KEY,
-    idUsuario INT NOT NULL,
+    idCliente INT NOT NULL,
     idNutricionista INT NOT NULL,
     fechaAsignacion DATE NOT NULL,
-    FOREIGN KEY (idUsuario) REFERENCES Usuario(idUsuario) ON DELETE CASCADE,
+    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente) ON DELETE CASCADE,
     FOREIGN KEY (idNutricionista) REFERENCES Nutricionista(idNutricionista) ON DELETE CASCADE
 );
 GO
 
 CREATE TABLE Asignacion_Entrenador (
     idAsignacion INT IDENTITY(1,1) PRIMARY KEY,
-    idUsuario INT NOT NULL,
+    idCliente INT NOT NULL,
     idEntrenador INT NOT NULL,
     fechaAsignacion DATE NOT NULL,
-    FOREIGN KEY (idUsuario) REFERENCES Usuario(idUsuario) ON DELETE CASCADE,
+    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente) ON DELETE CASCADE,
     FOREIGN KEY (idEntrenador) REFERENCES Entrenador(idEntrenador) ON DELETE CASCADE
 );
 GO
