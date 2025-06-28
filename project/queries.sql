@@ -3,25 +3,25 @@
 -- =============================================
 
 -- =============================================
--- 1. Consulta con JOIN - Usuarios con sus nutricionistas actuales
+-- 1. Consulta con JOIN - Clientes con sus nutricionistas actuales
 SELECT 
-    u.nombres + ' ' + u.apellidos AS Usuario,
+    c.nombres + ' ' + c.apellidos AS Cliente,
     n.nombre + ' ' + n.apellidos AS Nutricionista,
     an.fechaAsignacion
-FROM Usuario u
-INNER JOIN Asignacion_Nutricionista an ON u.idUsuario = an.idUsuario
+FROM Cliente c
+INNER JOIN Asignacion_Nutricionista an ON c.idCliente = an.idCliente
 INNER JOIN Nutricionista n ON an.idNutricionista = n.idNutricionista
 WHERE an.fechaAsignacion = (
     SELECT MAX(fechaAsignacion) 
     FROM Asignacion_Nutricionista 
-    WHERE idUsuario = u.idUsuario
+    WHERE idCliente = c.idCliente
 );
 -- =============================================
 
 -- =============================================
--- 2. Consulta con cálculo - IMC de todos los usuarios
+-- 2. Consulta con cálculo - IMC de todos los Clientes
 SELECT 
-    nombres + ' ' + apellidos AS Usuario,
+    nombres + ' ' + apellidos AS Cliente,
     peso,
     altura,
     ROUND(peso / (altura * altura), 2) AS IMC,
@@ -31,7 +31,7 @@ SELECT
         WHEN peso / (altura * altura) BETWEEN 25 AND 29.9 THEN 'Sobrepeso'
         ELSE 'Obesidad'
     END AS Clasificacion
-FROM Usuario;
+FROM Cliente;
 -- =============================================
 
 -- =============================================
@@ -54,25 +54,25 @@ GO
 -- 3.1. Usar la función creada
 SELECT 
     pa.idPlan,
-    u.nombres + ' ' + u.apellidos AS Usuario,
+    c.nombres + ' ' + c.apellidos AS Cliente,
     pa.tipoPlan,
     pa.caloriasDiarias AS CaloriasPlanificadas,
     dbo.fn_CaloriasTotalesPlan(pa.idPlan) AS CaloriasReales
 FROM Plan_Alimentacion pa
-INNER JOIN Usuario u ON pa.idUsuario = u.idUsuario;
+INNER JOIN Cliente c ON pa.idCliente = c.idCliente;
 -- =============================================
 
 -- =============================================
--- 4. Procedimiento almacenado - Reporte de actividad de usuario
-CREATE PROCEDURE sp_ReporteActividadUsuario
-    @idUsuario INT
+-- 4. Procedimiento almacenado - Reporte de actividad de Cliente
+CREATE PROCEDURE sp_ReporteActividadCliente
+    @idCliente INT
 AS
 BEGIN
     SELECT 
         'Planes de Alimentación' AS TipoActividad,
         COUNT(*) AS Cantidad
     FROM Plan_Alimentacion 
-    WHERE idUsuario = @idUsuario
+    WHERE idCliente = @idCliente
     
     UNION ALL
     
@@ -80,7 +80,7 @@ BEGIN
         'Rutinas Completadas' AS TipoActividad,
         COUNT(*) AS Cantidad
     FROM Rutina 
-    WHERE idUsuario = @idUsuario
+    WHERE idCliente = @idCliente
     
     UNION ALL
     
@@ -88,22 +88,22 @@ BEGIN
         'Recomendaciones Recibidas' AS TipoActividad,
         COUNT(*) AS Cantidad
     FROM Recomendaciones 
-    WHERE idUsuario = @idUsuario;
+    WHERE idCliente = @idCliente;
 END;
 GO
 
 -- 4.1. Ejecutar el procedimiento almacenado
-EXEC sp_ReporteActividadUsuario @idUsuario = 1;
+EXEC sp_ReporteActividadCliente @idCliente = 1;
 -- =============================================
 
 -- =============================================
--- 5. Consulta con subconsulta - Usuarios más activos
+-- 5. Consulta con subconsulta - Clientes más activos
 SELECT 
-    u.nombres + ' ' + u.apellidos AS Usuario,
-    (SELECT COUNT(*) FROM Rutina WHERE idUsuario = u.idUsuario) AS TotalRutinas,
-    (SELECT COUNT(*) FROM Plan_Alimentacion WHERE idUsuario = u.idUsuario) AS TotalPlanes
-FROM Usuario u
-WHERE (SELECT COUNT(*) FROM Rutina WHERE idUsuario = u.idUsuario) > 1
+    c.nombres + ' ' + c.apellidos AS Cliente,
+    (SELECT COUNT(*) FROM Rutina WHERE idCliente = c.idCliente) AS TotalRutinas,
+    (SELECT COUNT(*) FROM Plan_Alimentacion WHERE idCliente = c.idCliente) AS TotalPlanes
+FROM Cliente c
+WHERE (SELECT COUNT(*) FROM Rutina WHERE idCliente = c.idCliente) > 1
 ORDER BY TotalRutinas DESC;
 -- =============================================
 
@@ -124,74 +124,74 @@ ORDER BY VecesRealizado DESC;
 -- =============================================
 -- 7. Consulta con funciones de fecha - Planes activos en el mes actual
 SELECT 
-    u.nombres + ' ' + u.apellidos AS Usuario,
+    c.nombres + ' ' + c.apellidos AS Cliente,
     pa.tipoPlan,
     pa.fechaInicio,
     pa.fechaFin,
     DATEDIFF(DAY, pa.fechaInicio, pa.fechaFin) AS DuracionDias
 FROM Plan_Alimentacion pa
-INNER JOIN Usuario u ON pa.idUsuario = u.idUsuario
+INNER JOIN Cliente c ON pa.idCliente = c.idCliente
 WHERE pa.fechaInicio <= GETDATE() AND pa.fechaFin >= GETDATE();
 -- =============================================
 
 -- =============================================
 -- 8. Consulta con CASE y cálculos - Análisis de objetivos vs actividad
 SELECT 
-    u.objetivo,
-    COUNT(*) AS CantidadUsuarios,
-    AVG(CAST(u.tiempoDisponible AS FLOAT)) AS PromedioTiempoDisponible,
+    c.objetivo,
+    COUNT(*) AS CantidadClientes,
+    AVG(CAST(c.tiempoDisponible AS FLOAT)) AS PromedioTiempoDisponible,
     CASE 
-        WHEN AVG(CAST(u.tiempoDisponible AS FLOAT)) < 60 THEN 'Tiempo Limitado'
-        WHEN AVG(CAST(u.tiempoDisponible AS FLOAT)) BETWEEN 60 AND 90 THEN 'Tiempo Moderado'
+        WHEN AVG(CAST(c.tiempoDisponible AS FLOAT)) < 60 THEN 'Tiempo Limitado'
+        WHEN AVG(CAST(c.tiempoDisponible AS FLOAT)) BETWEEN 60 AND 90 THEN 'Tiempo Moderado'
         ELSE 'Tiempo Amplio'
     END AS ClasificacionTiempo
-FROM Usuario u
-GROUP BY u.objetivo;
+FROM Cliente c
+GROUP BY c.objetivo;
 -- =============================================
 
--- 9. Vista para consultas frecuentes - Resumen de usuarios
-CREATE VIEW vw_ResumenUsuarios AS
+-- 9. Vista para consultas frecuentes - Resumen de Clientes
+CREATE VIEW vw_ResumenClientes AS
 SELECT 
-    u.idUsuario,
-    u.nombres + ' ' + u.apellidos AS NombreCompleto,
-    u.edad,
-    u.objetivo,
-    u.nivelActividad,
-    ROUND(u.peso / (u.altura * u.altura), 2) AS IMC,
-    (SELECT COUNT(*) FROM Plan_Alimentacion WHERE idUsuario = u.idUsuario) AS TotalPlanes,
-    (SELECT COUNT(*) FROM Rutina WHERE idUsuario = u.idUsuario) AS TotalRutinas,
+    c.idCliente,
+    c.nombres + ' ' + c.apellidos AS NombreCompleto,
+    c.edad,
+    c.objetivo,
+    c.nivelActividad,
+    ROUND(c.peso / (c.altura * c.altura), 2) AS IMC,
+    (SELECT COUNT(*) FROM Plan_Alimentacion WHERE idCliente = c.idCliente) AS TotalPlanes,
+    (SELECT COUNT(*) FROM Rutina WHERE idCliente = c.idCliente) AS TotalRutinas,
     (SELECT TOP 1 nombre + ' ' + apellidos 
      FROM Nutricionista n 
      INNER JOIN Asignacion_Nutricionista an ON n.idNutricionista = an.idNutricionista
-     WHERE an.idUsuario = u.idUsuario 
+     WHERE an.idCliente = c.idCliente 
      ORDER BY an.fechaAsignacion DESC) AS NutricionistaActual
-FROM Usuario u;
+FROM Cliente c;
 GO
 
 -- 9.1 Consultar la vista creada
-SELECT * FROM vw_ResumenUsuarios WHERE IMC > 25; -- Los que tienen sobrepeso
+SELECT * FROM vw_ResumenClientes WHERE IMC > 25; -- Los que tienen sobrepeso
 -- =============================================
 
 -- =============================================
 -- 10. Consulta con múltiples JOINs - Detalle completo de rutinas
 SELECT 
-    u.nombres + ' ' + u.apellidos AS Usuario,
+    c.nombres + ' ' + c.apellidos AS Cliente,
     r.fecha AS FechaRutina,
     r.duracion AS DuracionTotal,
     e.nombre AS Ejercicio,
     dre.repeticiones,
     dre.series,
     e.calorias * dre.series AS CaloriasEjercicio
-FROM Usuario u
-INNER JOIN Rutina r ON u.idUsuario = r.idUsuario
+FROM Cliente c
+INNER JOIN Rutina r ON c.idCliente = r.idCliente
 INNER JOIN Detalle_Rutina_Ejercicio dre ON r.idRutina = dre.idRutina
 INNER JOIN Ejercicio e ON dre.idEjercicio = e.idEjercicio
-ORDER BY u.idUsuario, r.fecha, e.nombre;
+ORDER BY c.idCliente, r.fecha, e.nombre;
 -- =============================================
 
 -- =============================================
--- 11. Función para obtener el nutricionista actual de un usuario
-CREATE FUNCTION fn_NutricionistaActual(@idUsuario INT)
+-- 11. Función para obtener el nutricionista actual de un Cliente
+CREATE FUNCTION fn_NutricionistaActual(@idCliente INT)
 RETURNS VARCHAR(101)
 AS
 BEGIN
@@ -200,28 +200,28 @@ BEGIN
     SELECT TOP 1 @nutricionista = n.nombre + ' ' + n.apellidos
     FROM Nutricionista n
     INNER JOIN Asignacion_Nutricionista an ON n.idNutricionista = an.idNutricionista
-    WHERE an.idUsuario = @idUsuario
+    WHERE an.idCliente = @idCliente
     ORDER BY an.fechaAsignacion DESC;
     
     RETURN ISNULL(@nutricionista, 'Sin asignar');
 END;
 GO
 
--- 11.1 Consultar la función creada (para un usuario específico)
-SELECT dbo.fn_NutricionistaActual(5) AS NutricionistaAsignado; -- Nutricionista actual del usuario con ID 5
+-- 11.1 Consultar la función creada (para un Cliente específico)
+SELECT dbo.fn_NutricionistaActual(5) AS NutricionistaAsignado; -- Nutricionista actual del Cliente con ID 5
 
--- 11.2 Consultar la función creada para todos los usuarios
-SELECT  -- Para todos los usuarios
-    u.idUsuario,
-    u.nombres AS NombreUsuario,
-    dbo.fn_NutricionistaActual(u.idUsuario) AS NutricionistaAsignado
-FROM Usuario u;
+-- 11.2 Consultar la función creada para todos los Clientes
+SELECT  -- Para todos los Clientes
+    c.idCliente,
+    c.nombres AS NombreCliente,
+    dbo.fn_NutricionistaActual(c.idCliente) AS NutricionistaAsignado
+FROM Cliente c;
 -- =============================================
 
 -- =============================================
--- 12. Consulta con ranking - Top usuarios por actividad usando funciones de ventana
+-- 12. Consulta con ranking - Top Clientes por actividad usando funciones de ventana
 SELECT 
-    nombres + ' ' + apellidos AS Usuario,
+    nombres + ' ' + apellidos AS Cliente,
     TotalActividades,
     RANK() OVER (ORDER BY TotalActividades DESC) AS Ranking,
     CASE 
@@ -231,13 +231,13 @@ SELECT
     END AS NivelActividad
 FROM (
     SELECT 
-        u.idUsuario,
-        u.nombres,
-        u.apellidos,
-        (SELECT COUNT(*) FROM Plan_Alimentacion WHERE idUsuario = u.idUsuario) +
-        (SELECT COUNT(*) FROM Rutina WHERE idUsuario = u.idUsuario) +
-        (SELECT COUNT(*) FROM Recomendaciones WHERE idUsuario = u.idUsuario) AS TotalActividades
-    FROM Usuario u
-) AS ActividadesPorUsuario
+        c.idCliente,
+        c.nombres,
+        c.apellidos,
+        (SELECT COUNT(*) FROM Plan_Alimentacion WHERE idCliente = c.idCliente) +
+        (SELECT COUNT(*) FROM Rutina WHERE idCliente = c.idCliente) +
+        (SELECT COUNT(*) FROM Recomendaciones WHERE idCliente = c.idCliente) AS TotalActividades
+    FROM Cliente c
+) AS ActividadesPorCliente
 ORDER BY Ranking;
 -- =============================================
