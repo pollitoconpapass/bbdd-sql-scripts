@@ -241,3 +241,58 @@ FROM (
 ) AS ActividadesPorCliente
 ORDER BY Ranking;
 -- =============================================
+
+-- =============================================
+-- 13. Consulta de Lista sobre los datos en base a su objetivo, por medio de su alimentacion y ejercicio a detalle
+select MAX(c.nombres +'
+, '+ c.apellidos) as nombre_Completo, MAX(c.objetivo) as objetivo, dpa. tiempoComida, MAX(a.nombre) as alimentoPrincipal,
+MAX(a. tipoAlimento) as tipoAlimento, sum(a. calorias) as cantidadCaloriasEntrantes, MIN(e.nombre) as ejercicio
+_Finishet, count (e.duracion) as cantidad
+Lejercicios,
+SUM(e.duracion) as duracionEjercicios, sum(e calorias) as CantidadCaloriasSalientes
+from Cliente c
+JOIN Plan _Alimentacion pa ON c.idCliente = pa. idCliente
+JOIN Detalle_Plan _Alimento dpa ON pa. idPlan = dpa. idPlan
+JOIN Alimentos a ON dpa. idAlimento = a. idAlimento
+JOIN Rutina r ON c.idCliente = r. idCliente
+JOIN Detalle
+_Rutina_Ejercicio dre ON r. idRutina = dre. idRutina
+JOIN Ejercicio e ON dre idEjercicio = e idEjercicio
+Group by dpa. tiempoComida, c. idCliente order by MIN(c.idCliente), count (tiempoComida)
+-- =============================================
+
+-- =============================================
+-- 14. Funcion para obtener la hora de la comida mas consumida
+create or alter function dbo.HoraMASComelona
+(@usuario varchar(20))
+returns Varchar (20)
+As
+BEGIN
+DECLARE @ComidaTempo Varchar (20)
+DECLARE @contador Varchar (20)
+Select top 1 @contador = count(dpa.idAlimento), @ComidaTempo = dpa.tiempoComida FROM Cliente c
+JOIN Plan_Alimentacion pa ON c.idCliente = pa.idCliente
+JOIN Detalle_Plan_Alimento dpa ON pa.idPlan = dpa.idPlan
+JOIN Alimentos a ON dpa.idAlimento = a.idAlimento
+WHERE c.nombres = @usuario
+group by c.nombres, c.apellidos, dpa.tiempoComida
+Return @ComidaTempo
+end
+-- 14.1 llamada a la funcion
+select dbo. HoraMASComelona ('Alan Gabriel') as hora_mas_comelona
+-- =============================================
+
+-- =============================================
+-- 15. Procedimiento almacenado para obtener la lista de usuarios por entrenador
+Create or alter Procedure uspListadeUsuariosXEntrenador(
+@entrenadoreti varchar(15))
+AS
+BEGIN
+select c.nombres, c.apellidos, c.nivelActividad, c.peso, c.altura, ae.fechaAsignacion From cliente c
+JOIN Asignacion_Entrenador ae ON c.idCLiente = ae.idCliente
+JOIN Entrenador e ON ae.idEntrenador = e.idEntrenador
+WHERE e.nombre= @entrenadoreti
+END
+-- 15.1 ejecutar lista
+exec uspListadeUsuariosXEntrenador 'José Antonio'
+-- =============================================
